@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@18.175.216.204 << 'EOF'
-            cd ~/magnet-to-stream-microservice
+            cd ~/magnet-to-stream-microservice/t2s-bmad
 
             # Write .env file from GitHub secret
             echo "${{ secrets.ENV_FILE }}" > .env
