@@ -13,11 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install sshpass and set up SSH agent
+      - name: Set up SSH agent with passphrase
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          sudo apt-get update && sudo apt-get install -y sshpass
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
 
           # Create SSH directory
