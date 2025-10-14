@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main  # or your deployment branch
+      - main  # Change this if you deploy from a different branch
 
 jobs:
   deploy:
@@ -24,8 +24,15 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@18.175.216.204 << 'EOF'
             cd ~/magnet-to-stream-microservice
+
+            # Write .env file from GitHub secret
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Pull latest code and install dependencies
             git pull origin main
             npm install
+
+            # Restart service with pm2
             pm2 restart magnet-stream || pm2 start npm --name "magnet-stream" -- run dev
             pm2 save
           EOF
