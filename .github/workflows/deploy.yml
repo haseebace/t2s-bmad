@@ -20,6 +20,9 @@ jobs:
           sudo apt-get update && sudo apt-get install -y sshpass
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
 
+          # Create SSH directory
+          mkdir -p ~/.ssh
+
           # Write private key to file
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
@@ -45,3 +48,4 @@ jobs:
             # Restart service with pm2
             pm2 restart magnet-stream || pm2 start npm --name "magnet-stream" -- run dev
             pm2 save
+          EOF
