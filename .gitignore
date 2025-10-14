@@ -1,0 +1,4 @@
+.env/
+node_modules
+tests
+magnet-to-stream.postman_collection.json
