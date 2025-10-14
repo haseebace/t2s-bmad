@@ -19,7 +19,13 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+
+          # Write private key to file
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Add key using sshpass
+          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh-add ~/.ssh/id_rsa
 
       - name: Add server to known_hosts
         run: ssh-keyscan -H 18.175.216.204 >> ~/.ssh/known_hosts
@@ -29,9 +35,13 @@ jobs:
           ssh ubuntu@18.175.216.204 << 'EOF'
             cd ~/magnet-to-stream-microservice/t2s
 
+            # Write .env file from GitHub secret
             echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Pull latest code and install dependencies
             git pull origin main
             npm install
+
+            # Restart service with pm2
             pm2 restart magnet-stream || pm2 start npm --name "magnet-stream" -- run dev
             pm2 save
-          EOF
