@@ -19,21 +19,16 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add server to known_hosts
-        run: ssh-keyscan -H 18.175.216.204 >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H ec2-3-11-9-31.eu-west-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
         run: |
-          ssh ubuntu@18.175.216.204 << 'EOF'
+          ssh ubuntu@ec2-3-11-9-31.eu-west-2.compute.amazonaws.com << 'EOF'
             cd ~/magnet-to-stream-microservice/t2s
 
-            # Write .env file from GitHub secret
             echo "${{ secrets.ENV_FILE }}" > .env
-
-            # Pull latest code and install dependencies
             git pull origin main
             npm install
-
-            # Restart service with pm2
             pm2 restart magnet-stream || pm2 start npm --name "magnet-stream" -- run dev
             pm2 save
           EOF
