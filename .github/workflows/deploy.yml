@@ -24,11 +24,16 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh ubuntu@ec2-3-11-9-31.eu-west-2.compute.amazonaws.com << 'EOF'
-            cd ~/magnet-to-stream-microservice/t2s
+            cd ~/magnet-to-stream-microservice/t2s-bmad
 
+            # Write .env file from GitHub secret
             echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Pull latest code and install dependencies
             git pull origin main
             npm install
+
+            # Restart service with pm2
             pm2 restart magnet-stream || pm2 start npm --name "magnet-stream" -- run dev
             pm2 save
           EOF
