@@ -13,21 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH agent with passphrase
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-
-          # Create SSH directory
-          mkdir -p ~/.ssh
-
-          # Write private key to file
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-          # Add key using sshpass
-          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh-add ~/.ssh/id_rsa
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add server to known_hosts
         run: ssh-keyscan -H 18.175.216.204 >> ~/.ssh/known_hosts
